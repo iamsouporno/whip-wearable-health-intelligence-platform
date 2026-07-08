@@ -4,7 +4,7 @@
 
 ## PART I — BUSINESS & PRODUCT LOCK
 
-### 1. Executive Vision — Confirmed, One Addition
+### 1. Executive Vision
 
 Document 01's vision and six guiding principles (Unified Intelligence, Personalization, Transparency, Scientific Grounding, Modularity, Continuous Learning) stand. Document 10 surfaced one gap: none of the six principles explicitly address *partial or missing signal availability* — and we now know that's not an edge case, it's the majority case (HRV present 33% of days, SpO2 17%). Adding a seventh principle:
 
@@ -12,9 +12,9 @@ Document 01's vision and six guiding principles (Unified Intelligence, Personali
 
 ### 2. Opportunity Assessment — Reframed Honestly
 
-This isn't a market opportunity. It's an interview-signal opportunity, and it should be evaluated as one.
+This isn't a market opportunity. This's an interview-signal opportunity, and it should be treated as such.
 
-| nference requirement | WHIP capability demonstrating it | Evidence artifact |
+| Pulse capability demonstrating it | Evidence artifact |
 |---|---|---|
 | Python | ETL, feature engineering, ML pipeline | `/src` modules, notebooks |
 | SQL | Star-schema warehouse, window-function analytics | `/sql` schema + queries |
@@ -25,7 +25,7 @@ This isn't a market opportunity. It's an interview-signal opportunity, and it sh
 
 ### 3. Industry & Competitor Analysis
 
-| Platform | Known for | Gap WHIP targets |
+| Platform | Known for | Gap Pulse targets |
 |---|---|---|
 | WHOOP | Recovery %, strain | Proprietary scoring, opaque methodology |
 | Garmin | Training readiness | Fitness-athlete framing, not general wellness |
@@ -33,24 +33,23 @@ This isn't a market opportunity. It's an interview-signal opportunity, and it sh
 | Fitbit | Broad wellness metrics | Descriptive, not explanatory (confirmed directly in Document 10 — Fitbit's own composite scores like `stress_score` are themselves only 25% populated) |
 | Apple Health | Aggregation | Aggregates, doesn't reason |
 
-None of them show *why* a score changed with transparent, auditable evidence, and none of them communicate *confidence* when signal coverage is thin. That combination — not "another recovery score" — is WHIP's actual differentiation, and it's a differentiation Document 10's findings made *necessary*, not just nice-to-have.
+None of them show *why* a score changed with transparent, auditable evidence, and none of them communicate *confidence* when signal coverage is thin. That combination — not "another recovery score" — is Pulse's actual differentiation, and it's a differentiation Document 10's findings made *necessary*, not just nice-to-have.
 
 ### 4. Business Thesis
 
-WHIP's thesis: an intelligence layer is more valuable — and more demonstrable as a DS skillset — when it's honest about uncertainty than when it's falsely complete. A model that says "moderate confidence, based on 4 of 7 signals" is more defensible in an interview than one that silently imputes and presents a clean number. This thesis is now directly evidence-backed by Document 10, not just a design preference.
+Pulse's thesis: an intelligence layer is more valuable — and more demonstrable as a DS skillset — when it's honest about uncertainty than when it's falsely complete. A model that says "moderate confidence, based on 4 of 7 signals" is more defensible in an interview than one that silently imputes and presents a clean number. This thesis is now directly evidence-backed by Document 10, not just a design preference.
 
 ### 5. Project Charter
 
-**In scope (v1):**
 - Full ETL + canonical warehouse for LifeSnaps (71 participants)
 - EDA, feature engineering, statistical baselining
-- 3 ML tasks (trimmed from original 6 — see §9)
+- 3 ML tasks (trimmed from original 6 — see 9)
 - Explainability layer (SHAP/coefficient-based)
 - LLM explanation assistant (single-turn + basic RAG over participant history)
 - 4 Power BI dashboards
 - Full documentation set
 
-**Explicitly out of scope (v1) — and why:**
+**Explicitly out of scope — and why:**
 | Excluded | Reason |
 |---|---|
 | Live device integration / real-time ingestion | No live users; batch analytics on a static research dataset is the honest framing and still demonstrates the full pipeline |
