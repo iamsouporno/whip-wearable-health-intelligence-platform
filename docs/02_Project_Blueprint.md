@@ -4,13 +4,13 @@
 
 ## PART I — BUSINESS & PRODUCT LOCK
 
-### §1. Executive Vision — Confirmed, One Addition
+### 1. Executive Vision — Confirmed, One Addition
 
 Document 01's vision and six guiding principles (Unified Intelligence, Personalization, Transparency, Scientific Grounding, Modularity, Continuous Learning) stand. Document 10 surfaced one gap: none of the six principles explicitly address *partial or missing signal availability* — and we now know that's not an edge case, it's the majority case (HRV present 33% of days, SpO2 17%). Adding a seventh principle:
 
 **Confidence-Awareness:** Every output states not just *what* was predicted but *how much evidence supported it*. A recovery score computed from 3 signals is presented differently than one computed from 7. This is not a caveat bolted onto the UI — it's an architectural property that has to be threaded through the data model, features, models, and LLM layer (see §11, §14, §17, §18).
 
-### §2. Opportunity Assessment — Reframed Honestly
+### 2. Opportunity Assessment — Reframed Honestly
 
 This isn't a market opportunity. It's an interview-signal opportunity, and it should be evaluated as one.
 
@@ -23,7 +23,7 @@ This isn't a market opportunity. It's an interview-signal opportunity, and it sh
 | LLM/RAG (preferred) | Explanation layer over structured ML output | Prompt contracts + example transcripts |
 | High communication | This entire document series + README | `/docs` |
 
-### §3. Industry & Competitor Analysis
+### 3. Industry & Competitor Analysis
 
 | Platform | Known for | Gap WHIP targets |
 |---|---|---|
@@ -35,11 +35,11 @@ This isn't a market opportunity. It's an interview-signal opportunity, and it sh
 
 None of them show *why* a score changed with transparent, auditable evidence, and none of them communicate *confidence* when signal coverage is thin. That combination — not "another recovery score" — is WHIP's actual differentiation, and it's a differentiation Document 10's findings made *necessary*, not just nice-to-have.
 
-### §4. Business Thesis
+### 4. Business Thesis
 
 WHIP's thesis: an intelligence layer is more valuable — and more demonstrable as a DS skillset — when it's honest about uncertainty than when it's falsely complete. A model that says "moderate confidence, based on 4 of 7 signals" is more defensible in an interview than one that silently imputes and presents a clean number. This thesis is now directly evidence-backed by Document 10, not just a design preference.
 
-### §5. Project Charter
+### 5. Project Charter
 
 **In scope (v1):**
 - Full ETL + canonical warehouse for LifeSnaps (71 participants)
@@ -62,7 +62,7 @@ WHIP's thesis: an intelligence layer is more valuable — and more demonstrable 
 
 **Success criteria:** every component traceable to a JD requirement (§2), every claim traceable to real computed output (matching the standard already set by your Olist and A/B testing projects), repo readable end-to-end by a stranger in under 15 minutes via README.
 
-### §6. Business Requirements (BRD) — Testable Statements
+### 6. Business Requirements (BRD) — Testable Statements
 
 1. The system shall ingest LifeSnaps daily and hourly source files and produce a queryable warehouse without manual data manipulation.
 2. The system shall compute personalized (not population-normed) baselines for each participant.
@@ -71,20 +71,20 @@ WHIP's thesis: an intelligence layer is more valuable — and more demonstrable 
 5. The system shall communicate insights via natural language without the LLM independently generating physiological claims.
 6. The system shall expose all analytical layers (warehouse, features, models) through Power BI.
 
-### §7. Product Requirements (PRD)
+### 7. Product Requirements (PRD)
 
 **Demo persona decision (evidence-based, not arbitrary):** I profiled all 71 participants on longitudinal length × signal coverage. Participant `621e32e6...` has 97 days of data with 93.8% HRV coverage, 85.6% SpO2 coverage, and 92.8% sleep coverage simultaneously — the best *balance* of duration and multi-signal completeness (a 64-day participant scores marginally higher on coverage alone but doesn't give enough history for meaningful 28-day rolling baselines). **Recommendation: this participant becomes the flagship narrative thread** across README screenshots, dashboard defaults, and written case-study sections — while the underlying system stays fully participant-agnostic (every dashboard and model supports selecting any of the 71). This gives interviewers one coherent story to follow instead of an abstract "works on N=71" claim.
 
 **Product surfaces:** GitHub repo (primary artifact) → Jupyter notebooks (narrated analysis, matching your Olist/A-B testing standard) → SQL warehouse (DuckDB file, inspectable) → Power BI dashboards (`.pbix` + exported screenshots, since Power BI Desktop isn't available in this sandbox — see §19) → LLM assistant (runnable notebook/script demo, not a hosted app).
 
-### §8. Functional Requirements (FRD) — Representative Sample
+### 8. Functional Requirements (FRD) — Representative Sample
 
 - FR1: Given a participant and date, the system shall return a 28-day rolling HRV baseline *only if* ≥5 valid readings exist in that window; otherwise it shall return `confidence: insufficient` rather than a value.
 - FR2: The recovery score shall be computed from whichever of {HRV, RHR, sleep efficiency, prior-day strain} are available for that day, with the confidence tier downgraded as fewer are present — never silently imputed to look complete.
 - FR3: Every LLM-generated explanation shall cite the specific structured fields it was given; the system shall log the exact JSON payload passed to the LLM for auditability.
 - FR4: Anomaly flags shall be participant-relative (deviation from that person's own distribution), never population-relative.
 
-### §9. Machine Learning Requirements Specification (MLRS) — Trimmed and Justified
+### 9. Machine Learning Requirements Specification (MLRS) — Trimmed and Justified
 
 The original wishlist (recovery prediction, forecasting, anomaly detection, clustering, recommendation engine) gets one real cut, based on evidence, not on preserving the original list for its own sake:
 
@@ -103,7 +103,7 @@ The original wishlist (recovery prediction, forecasting, anomaly detection, clus
 
 ## PART II — TECHNICAL ARCHITECTURE LOCK
 
-### §10. Enterprise System Architecture
+### 10. Enterprise System Architecture
 
 ```
 LifeSnaps CSV/BSON  ──►  Ingestion & Validation (Python)
@@ -135,7 +135,7 @@ LifeSnaps CSV/BSON  ──►  Ingestion & Validation (Python)
 | SQLite | Rejected — row-oriented, weak window-function/analytical performance at scale |
 | **DuckDB** | **Selected** — embedded (zero infra), columnar (built for exactly this kind of analytical query), full SQL window-function support, directly queryable from Python/pandas, and connects to Power BI via ODBC driver — resolves the open "DuckDB + Power BI connectivity" question directly. This is also a more sophisticated, current choice than defaulting to Postgres, and shows judgment about matching tooling to problem shape rather than reaching for the most familiar option. |
 
-### §11. Canonical Health Data Model
+### 11. Canonical Health Data Model
 
 Source-agnostic by design — LifeSnaps today, 2016 Fitbit or Apple Health later, without redesigning anything downstream.
 
@@ -150,7 +150,7 @@ Source-agnostic by design — LifeSnaps today, 2016 Fitbit or Apple Health later
 
 Every physiological metric that Document 10 flagged as high-missingness gets a paired `*_confidence_tier` column (`HIGH` / `MEDIUM` / `LOW` / `ABSENT`) computed at ingestion — confidence-awareness enforced structurally, not left to downstream code to remember.
 
-### §12. Data Engineering Strategy
+### 12. Data Engineering Strategy
 
 **Pipeline layers:** raw (untouched source files, checksummed) → staging (typed, parsed, one row = one source record) → canonical (mapped into §11's model) → warehouse (DuckDB, aggregated + indexed).
 
@@ -165,11 +165,11 @@ Every physiological metric that Document 10 flagged as high-missingness gets a p
 
 **Orchestration: a plain Python script sequence (or a lightweight Makefile), not Airflow.** For a single-batch, single-developer, non-recurring pipeline, an orchestrator like Airflow adds operational surface area (scheduler, metadata DB, DAG server) with zero benefit — a senior reviewer would read Airflow-for-a-static-CSV as over-engineering, not sophistication. Idempotency instead comes from checksummed raw inputs and a pipeline that can be re-run end-to-end deterministically.
 
-### §13. SQL Warehouse Strategy
+### 13. SQL Warehouse Strategy
 
 Star schema, fact tables at §11's grain, dimensions `dim_participant` and `dim_date`. This directly supports the kind of query that actually demonstrates SQL skill for this JD: e.g., a 28-day trailing window function partitioned by participant, ordered by date, computing rolling median/MAD HRV — the exact query the personalized-baseline feature (§14) depends on, and a legitimate "here's a non-trivial window function" interview artifact rather than a `SELECT * WHERE`.
 
-### §14. Feature Engineering Strategy
+### 14. Feature Engineering Strategy
 
 **Confidence tiers** (applied wherever a signal has >20% missingness per Document 10):
 - `HIGH`: ≥80% of trailing window observed
@@ -179,13 +179,13 @@ Star schema, fact tables at §11's grain, dimensions `dim_participant` and `dim_
 
 **Personal baseline methodology:** rolling 28-day window, **median and MAD (median absolute deviation) rather than mean/SD** — robust to the outliers and irregular sampling Document 10 confirmed are real, with a minimum-observation floor (≥5 valid readings) below which the baseline itself is marked `insufficient` rather than computed from too few points.
 
-### §15. Statistical Analysis Strategy
+### 15. Statistical Analysis Strategy
 
 - Baseline construction: as above (§14), justified specifically because in-the-wild wearable data is known to have irregular, non-Gaussian missingness patterns — mean/SD would be distorted by exactly the sparse-sampling issue Document 10 quantified.
 - Planned hypothesis tests: paired comparisons (e.g., weekday vs. weekend recovery) using Wilcoxon signed-rank rather than paired t-test by default, since daily physiological deltas are not reliably normal at N≈100/participant — falling back to the parametric test only where normality checks (Shapiro-Wilk) pass.
 - Because many signals get tested against many outcomes, **Benjamini-Hochberg FDR correction** applies to any multi-comparison analysis — flagging this now so it's not an afterthought added post-hoc when a reviewer asks "did you correct for multiple comparisons?"
 
-### §16. Machine Learning Strategy
+### 16. Machine Learning Strategy
 
 | Task | Target | Candidates considered | Recommended | Why |
 |---|---|---|---|---|
@@ -198,11 +198,11 @@ Star schema, fact tables at §11's grain, dimensions `dim_participant` and `dim_
 
 **No deep learning anywhere in v1**, stated explicitly and defended above — this is a considered scope decision given N, not a capability gap.
 
-### §17. Explainable AI Strategy
+### 17. Explainable AI Strategy
 
 Tree/GBM-based forecasts explained via SHAP; the transparent statistical composite (§16) is explained by construction (its formula *is* its explanation — weighted contribution per signal, already interpretable). Every explanation surfaces the confidence tier (§14) alongside the evidence, so "why" answers also honestly answer "how sure."
 
-### §18. LLM Communication Strategy
+### 18. LLM Communication Strategy
 
 **Strict input contract:** the LLM receives *only* a structured JSON payload — computed feature values, model output, confidence tier, top SHAP factors — never raw physiological tables, and never asked to "figure out" a health conclusion itself. This is enforced at the prompt-construction layer, not just requested via instruction.
 
@@ -212,7 +212,7 @@ Tree/GBM-based forecasts explained via SHAP; the transparent statistical composi
 
 **Guardrail:** explicit system-level instruction plus a lightweight output check that the assistant never uses diagnostic or prescriptive medical language — it explains patterns, it does not diagnose or prescribe.
 
-### §19. Power BI Strategy
+### 19. Power BI Strategy
 
 | Dashboard | Feeds from |
 |---|---|
@@ -223,7 +223,7 @@ Tree/GBM-based forecasts explained via SHAP; the transparent statistical composi
 
 **Import mode, not DirectQuery** — the warehouse is static/batch (a fixed research dataset, not a live feed), so Import gives better performance with no real downside. **Connectivity: DuckDB's ODBC driver** into Power BI Desktop, resolving the open technical question directly. One practical note: Power BI Desktop itself isn't installable in this sandbox, so dashboards get built by you locally against the DuckDB file this pipeline produces, or via exported `.csv`/screenshots for repo documentation — flagging this now rather than at the end of the roadmap.
 
-### §20. Implementation Roadmap
+### 20. Implementation Roadmap
 
 | Phase | Deliverable | Depends on |
 |---|---|---|
@@ -238,9 +238,229 @@ Tree/GBM-based forecasts explained via SHAP; the transparent statistical composi
 | 8 | Power BI dashboards | Phase 3 (can start once warehouse exists) |
 | 9 | README, architecture diagrams, final polish | All prior |
 
+# 21 Stakeholder Matrix
+
+The Wearable Health Intelligence Platform is developed as an enterprise-inspired Data Science project. Although the implementation is performed by a single developer, the project is documented as if it were executed by a cross-functional engineering team. This clarifies ownership, responsibilities, and traceability of project decisions.
+
+| Stakeholder | Responsibility | Deliverables |
+|-------------|----------------|--------------|
+| Project Sponsor | Defines the overall project vision and success criteria | Vision, Roadmap |
+| Business Analyst | Defines business objectives and requirements | BRD, Business Rules |
+| Product Manager | Defines product capabilities and roadmap | PRD, Product Strategy |
+| Data Engineer | Builds ETL pipeline and analytical warehouse | ETL, DuckDB, SQL |
+| Data Scientist | Performs EDA, feature engineering, statistical analysis and model evaluation | EDA, ML Models |
+| Machine Learning Engineer | Develops and validates machine learning workflows | Forecasting, Anomaly Detection |
+| Analytics Engineer | Designs analytical data models and reporting views | SQL Models |
+| BI Developer | Builds dashboards and executive reporting | Power BI Dashboards |
+| AI Engineer | Designs the LLM explanation layer | AI Summaries |
+| End User | Consumes personalized health intelligence | Dashboards, Reports |
+
+Although these roles are consolidated into a single implementation for this portfolio project, documenting responsibilities reflects standard enterprise software development practices.
+
 ---
 
-## Carried-Forward Risks (explicit, not hidden)
+# 22 Assumptions
+
+The project is based on the following assumptions.
+
+### Data
+
+- The LifeSnaps dataset is representative of real-world wearable behaviour.
+- Longitudinal physiological observations are sufficient to establish personal baselines.
+- Missing physiological signals are expected and represent realistic wearable usage rather than data corruption.
+
+### Engineering
+
+- DuckDB provides sufficient analytical performance for this project.
+- Python is the primary implementation language.
+- SQL is used for analytical modelling and querying.
+- Power BI Desktop is available locally for dashboard development.
+
+### Machine Learning
+
+- Statistical methods remain appropriate for baseline modelling.
+- Classical machine learning methods are sufficient given the available dataset size.
+- Deep learning is intentionally excluded from Version 1 due to dataset scale and overfitting risk.
+
+### Artificial Intelligence
+
+- Large Language Models are used exclusively to explain structured analytical outputs.
+- LLMs do not generate predictions or medical conclusions.
+
+### Project
+
+- This project remains research-oriented.
+- No clinical validation is performed.
+- The platform is not intended for medical diagnosis or treatment.
+
+---
+
+# 23 Constraints
+
+The following constraints define the boundaries of Version 1.
+
+### Data Constraints
+
+- Static research dataset.
+- Missing HRV and SpO₂ observations.
+- Limited participant population.
+- No continuous real-time data ingestion.
+
+### Technical Constraints
+
+- Local execution environment.
+- DuckDB analytical warehouse.
+- Power BI Desktop for visualization.
+- No cloud infrastructure.
+- No streaming architecture.
+
+### Business Constraints
+
+- Single-developer implementation.
+- Portfolio-focused scope.
+- Limited project timeline.
+- Open-source technologies only.
+
+### Regulatory Constraints
+
+- No medical claims.
+- No clinical decision support.
+- No regulatory healthcare compliance certification.
+- Wellness-oriented analytics only.
+
+---
+
+# 24 Non-Functional Requirements
+
+In addition to functional requirements, the platform must satisfy the following quality attributes.
+
+## Performance
+
+- ETL execution should complete within reasonable time on standard consumer hardware.
+- Analytical SQL queries should support interactive dashboard exploration.
+- Machine learning pipelines should execute reproducibly.
+
+## Reliability
+
+- Invalid source data should never silently propagate through the pipeline.
+- Validation failures must stop execution and generate logs.
+
+## Maintainability
+
+- Every module shall have a single responsibility.
+- Code shall follow modular architecture.
+- Public interfaces shall be documented.
+
+## Reproducibility
+
+- Pipeline executions must produce identical outputs when provided identical inputs.
+- Configuration should remain externalized wherever possible.
+
+## Scalability
+
+- The canonical health data model shall support future wearable ecosystems without redesign.
+- New physiological signals should integrate through feature engineering rather than structural modification.
+
+## Security
+
+- No personally identifiable information shall be stored beyond the anonymized research dataset.
+- Secrets and configuration files shall remain external to source code.
+
+## Documentation
+
+- Every engineering module shall include documentation.
+- Design decisions shall be traceable to business objectives.
+
+## Testing
+
+- Automated validation shall accompany every major engineering component.
+- Data integrity tests shall execute before downstream analytical processing.
+
+---
+
+# 25 Success Metrics (KPIs)
+
+Project success is evaluated across business, engineering, analytics, and machine learning dimensions.
+
+## Business KPIs
+
+- Complete end-to-end Data Science implementation.
+- Professional project documentation.
+- Clear business-to-technical traceability.
+
+## Engineering KPIs
+
+- Successful ETL execution.
+- Canonical warehouse validation.
+- Referential integrity maintained.
+- Zero undocumented data loss.
+
+## Data Quality KPIs
+
+- Missingness reports generated.
+- Schema validation completed.
+- Data quality reports automatically produced.
+
+## Machine Learning KPIs
+
+- Participant-independent validation using GroupKFold.
+- Appropriate evaluation metrics selected for each task.
+- Explainable feature importance generated.
+- Model limitations documented.
+
+## Dashboard KPIs
+
+- Executive dashboard operational.
+- Health intelligence dashboard operational.
+- Machine learning insights dashboard operational.
+
+## Portfolio KPIs
+
+- Complete GitHub repository.
+- Reproducible execution.
+- Professional documentation.
+- Interview-ready project structure.
+
+---
+
+# 26 Requirements Traceability Matrix
+
+Every business objective should map directly to implementation components.
+
+| Business Objective | BRD | PRD | FRD | Architecture | ML | Dashboard |
+|--------------------|-----|-----|-----|--------------|----|-----------|
+| Unified Wearable Intelligence | BR-01 | PR-01 | FR-01 | Canonical Data Model | — | Executive Dashboard |
+| Personalized Health Analysis | BR-02 | PR-03 | FR-07 | Feature Engineering | Baseline Analytics | Health Dashboard |
+| Confidence-aware Analytics | BR-03 | PR-05 | FR-12 | Statistical Engine | Confidence Engine | Health Dashboard |
+| Predictive Intelligence | BR-04 | PR-06 | FR-15 | ML Pipeline | Forecasting | Prediction Dashboard |
+| Explainable AI | BR-05 | PR-07 | FR-18 | Explanation Layer | Feature Importance | AI Summary Dashboard |
+| Business Reporting | BR-06 | PR-08 | FR-20 | Reporting Layer | — | Executive Dashboard |
+
+This matrix ensures every business requirement is implemented, validated, and traceable throughout the project lifecycle.
+
+---
+
+# 27 Decision Log
+
+Major architectural decisions were recorded throughout project planning.
+
+| Decision | Rationale |
+|----------|-----------|
+| Use LifeSnaps as the primary dataset | Richest publicly available longitudinal wearable dataset with physiological and behavioural signals. |
+| Use DuckDB as the analytical warehouse | Lightweight, columnar, SQL-native, and integrates well with analytical workflows. |
+| Build a Canonical Health Data Model | Enables future integration of Apple Health, Garmin, Fitbit, WHOOP, Oura and other wearable ecosystems. |
+| Use participant-based GroupKFold validation | Prevents participant leakage between training and validation datasets. |
+| Exclude deep learning from Version 1 | Dataset size does not justify deep neural networks; classical ML provides better generalization and interpretability. |
+| Implement confidence-aware analytics | Missing wearable signals should reduce analytical confidence rather than produce misleading conclusions. |
+| Restrict LLM usage to explanation | Predictions remain grounded in statistical and machine learning outputs; LLMs provide natural-language interpretation only. |
+| Separate ETL from analytical intelligence | Data engineering produces validated facts; statistical analysis and machine learning generate intelligence. |
+| Use modular architecture | Supports maintainability, extensibility, and independent testing of system components. |
+
+These decisions collectively define the architectural foundation of the Wearable Health Intelligence Platform and provide justification for all major technical choices implemented throughout the project.
+
+---
+
+## Carried-Forward Risks
 
 1. HRV/SpO2 sparsity limits daily-guaranteed recovery scoring — mitigated by confidence tiers, not solved.
 2. 71 participants is enough for personalized (within-person) modeling, thin for any between-person generalization claims — the project should never claim population-level generalizability.
