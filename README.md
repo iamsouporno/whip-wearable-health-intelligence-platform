@@ -2,7 +2,7 @@
 
 > **An Enterprise-Grade Healthcare AI & Data Science Platform for Explainable Wearable Health Intelligence**
 
-WHIP (Wearable Health Intelligence Platform) is an end-to-end Data Science project that transforms longitudinal wearable health data into personalized, explainable, and confidence-aware health intelligence using Data Engineering, Statistics, Machine Learning, Explainable AI, Large Language Models (LLMs), and Business Intelligence.
+Pulse (Wearable Health Intelligence Platform) is an end-to-end Data Science project that transforms longitudinal wearable health data into personalized, explainable, and confidence-aware health intelligence using Data Engineering, Statistics, Machine Learning, Explainable AI, Large Language Models (LLMs), and Business Intelligence.
 
 The project demonstrates the complete Data Science lifecycle—from business understanding and research through engineering, analytics, machine learning, explainability, and visualization—using the LifeSnaps wearable dataset.
 
