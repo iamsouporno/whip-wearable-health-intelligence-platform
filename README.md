@@ -1,4 +1,4 @@
-# WHIP — Wearable Health Intelligence Platform
+# Pulse — Wearable Health Intelligence Platform
 
 > **An Enterprise-Grade Healthcare AI & Data Science Platform for Explainable Wearable Health Intelligence**
 
